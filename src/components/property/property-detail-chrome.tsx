@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight, Heart, Info } from "lucide-react";
 import { toast } from "sonner";
 import { useMounted } from "@/hooks";
@@ -132,9 +133,9 @@ export function PropertyDetailChrome({
             className="flex min-w-0 flex-wrap items-center gap-x-1 text-[12px] text-[#888]"
             aria-label="Breadcrumb"
           >
-            <a href="/" className="hover:text-gold-rich">
+            <Link href="/" className="hover:text-gold-rich">
               Home
-            </a>
+            </Link>
             <ChevronRight className="h-3 w-3 shrink-0 opacity-50" />
             <span className="truncate">
               Property for {isRent ? "rent" : "sale"} in {property.city}

@@ -107,6 +107,8 @@ export function Navbar() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+    // close is stable enough for Escape handling; avoid re-binding every render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const iconBtn = cn(

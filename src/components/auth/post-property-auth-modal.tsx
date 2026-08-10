@@ -56,7 +56,7 @@ export function PostPropertyAuthModal({
   const router = useRouter();
   const setSession = useAuthStore((s) => s.setSession);
   const [step, setStep] = useState<Step>("phone");
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [email, setEmail] = useState("");
