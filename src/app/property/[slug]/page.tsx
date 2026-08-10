@@ -33,7 +33,6 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
-  getAllProperties,
   getBuilderById,
   getPropertyBySlug,
   getSimilarProperties,
@@ -55,9 +54,13 @@ interface PropertyPageProps {
   params: Promise<{ slug: string }>;
 }
 
+/** Skip build-time API calls — Render DB may be down / cold during Vercel build. */
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
-  const properties = await getAllProperties();
-  return properties.map((p) => ({ slug: p.slug }));
+  // Never fetch during `next build`; pages render on demand at request time.
+  return [];
 }
 
 export async function generateMetadata({

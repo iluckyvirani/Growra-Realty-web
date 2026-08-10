@@ -2,8 +2,25 @@ import type { Property, SearchFilters } from "@/types";
 import { builders, cities, blogPosts, testimonials, faqs, reviews } from "@/data";
 import type { Builder, City, BlogPost } from "@/types";
 
-const API_URL =
+const RAW_API_URL =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:4000/api";
+
+/** Placeholder / invalid hosts must not break Vercel builds. */
+function isUsableApiUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    const host = u.hostname.toLowerCase();
+    if (!host || host === "your-api-host" || host.includes("example.com") || host.includes("YOUR-")) {
+      return false;
+    }
+    if (host.startsWith("your-") || host.includes("placeholder")) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const API_URL = isUsableApiUrl(RAW_API_URL) ? RAW_API_URL : "";
 
 type ListResponse = {
   success: boolean;
@@ -17,18 +34,28 @@ type DetailResponse = {
   similar?: Property[];
 };
 
-async function fetchProperties(params: Record<string, string | number | undefined> = {}) {
+async function fetchProperties(
+  params: Record<string, string | number | undefined> = {},
+): Promise<Property[]> {
+  if (!API_URL) return [];
+
   const qs = new URLSearchParams();
   Object.entries(params).forEach(([k, v]) => {
     if (v !== undefined && v !== "" && v !== null) qs.set(k, String(v));
   });
   const url = `${API_URL}/properties${qs.toString() ? `?${qs}` : ""}`;
-  const res = await fetch(url, {
-    next: { revalidate: 30 },
-  });
-  if (!res.ok) throw new Error(`Properties API ${res.status}`);
-  const json = (await res.json()) as ListResponse;
-  return json.data ?? [];
+
+  try {
+    const res = await fetch(url, {
+      next: { revalidate: 30 },
+    });
+    if (!res.ok) return [];
+    const json = (await res.json()) as ListResponse;
+    return json.data ?? [];
+  } catch {
+    // Offline / bad DNS / build without API — never fail the Next build
+    return [];
+  }
 }
 
 export async function getAllProperties(): Promise<Property[]> {
@@ -36,12 +63,13 @@ export async function getAllProperties(): Promise<Property[]> {
 }
 
 export async function getPropertyBySlug(slug: string): Promise<Property | undefined> {
+  if (!API_URL) return undefined;
   try {
     const res = await fetch(`${API_URL}/properties/${encodeURIComponent(slug)}`, {
       next: { revalidate: 30 },
     });
     if (res.status === 404) return undefined;
-    if (!res.ok) throw new Error(`Property API ${res.status}`);
+    if (!res.ok) return undefined;
     const json = (await res.json()) as DetailResponse;
     return json.data;
   } catch {
@@ -84,6 +112,7 @@ export async function getSimilarProperties(
   property: Property,
   limit = 4,
 ): Promise<Property[]> {
+  if (!API_URL) return [];
   try {
     const res = await fetch(`${API_URL}/properties/${encodeURIComponent(property.slug)}`, {
       next: { revalidate: 30 },
