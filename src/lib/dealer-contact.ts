@@ -1,7 +1,7 @@
 import { GROWRA_CONTACT } from "@/constants";
 
 /** Always Growra Realty — never owner or agent numbers. */
-export function getDealerPhone(_propertyId?: string): {
+export function getDealerPhone(): {
   display: string;
   tel: string;
   masked: string;

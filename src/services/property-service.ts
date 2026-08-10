@@ -104,10 +104,7 @@ export async function getSimilarProperties(
 }
 
 export async function searchProperties(filters: SearchFilters): Promise<Property[]> {
-  let listingType = filters.listingType;
-  if (listingType === "luxury") {
-    // handled via luxury flag + listingType
-  }
+  const listingType = filters.listingType;
 
   const rows = await fetchProperties({
     q: filters.query,
