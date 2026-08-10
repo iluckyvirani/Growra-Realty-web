@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-gold: #c89b3c;
+  --color-gold-rich: #b8860b;
+  --color-gold-light: #e8c76a;
+  --color-champagne: #f5e6c4;
+  --color-charcoal: #1b1b1b;
+  --color-ink: #111111;
+  --color-cream: #faf8f3;
+  --color-surface: #ffffff;
+  --color-border: #e8e2d8;
+  --color-foreground: #222222;
+  --color-muted: #6b7280;
+  --color-success: #16a34a;
+  --color-danger: #dc2626;
+  --color-background: var(--background);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --font-sans: var(--font-inter);
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+}
+
+:root {
+  --background: #faf8f3;
+  --foreground: #222222;
+  --card: #ffffff;
+  --card-foreground: #222222;
+  --primary: #c89b3c;
+  --primary-foreground: #ffffff;
+  --secondary: #f5e6c4;
+  --secondary-foreground: #1b1b1b;
+  --accent: #e8c76a;
+  --accent-foreground: #1b1b1b;
+  --muted: #6b7280;
+  --destructive: #dc2626;
+  --border: #e8e2d8;
+  --input: #e8e2d8;
+  --ring: #c89b3c;
+}
+
+.dark {
+  --background: #111111;
+  --foreground: #f5f5f5;
+  --card: #1b1b1b;
+  --card-foreground: #f5f5f5;
+  --primary: #c89b3c;
+  --primary-foreground: #111111;
+  --secondary: #2a2418;
+  --secondary-foreground: #f5e6c4;
+  --accent: #b8860b;
+  --accent-foreground: #ffffff;
+  --muted: #9ca3af;
+  --destructive: #ef4444;
+  --border: #2e2a24;
+  --input: #2e2a24;
+  --ring: #e8c76a;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  ::selection {
+    @apply bg-gold/30 text-foreground;
+  }
+}
+
+@layer utilities {
+  .gold-gradient {
+    background-image: linear-gradient(135deg, #b8860b 0%, #c89b3c 45%, #e8c76a 100%);
+  }
+
+  .gold-text {
+    background-image: linear-gradient(135deg, #b8860b 0%, #c89b3c 50%, #e8c76a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .glass {
+    @apply border border-white/20 bg-white/70 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-charcoal/70;
+  }
+
+  .section-padding {
+    @apply px-4 py-16 sm:px-6 md:py-20 lg:px-8 xl:px-12;
+  }
+
+  .container-luxury {
+    @apply mx-auto w-full max-w-7xl;
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+body.portal-mode {
+  padding-bottom: 0 !important;
+}
