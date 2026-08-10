@@ -17,13 +17,22 @@ import { FaqSection } from "@/components/home/faq-section";
 import { CuratedQuickLinksSection } from "@/components/home/curated-quick-links-section";
 import { AppCta } from "@/components/home/app-cta";
 import { SITE_DESCRIPTION, SITE_NAME } from "@/constants";
+import {
+  getPropertiesByListingType,
+  getTrendingProperties,
+} from "@/services/property-service";
 
 export const metadata: Metadata = {
   title: `${SITE_NAME} | Discover Extraordinary Living`,
   description: SITE_DESCRIPTION,
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [projects, trending] = await Promise.all([
+    getPropertiesByListingType("projects").then((p) => p.slice(0, 6)),
+    getTrendingProperties(),
+  ]);
+
   return (
     <>
       <HeroSection />
@@ -36,8 +45,8 @@ export default function HomePage() {
       <NewlyLaunchedSection />
       <PopularCities />
       <BenefitsSection />
-      <FeaturedProjects />
-      <TrendingProperties />
+      <FeaturedProjects projects={projects} />
+      <TrendingProperties properties={trending} />
       <BudgetSection />
       <TestimonialsSection />
       <FaqSection />

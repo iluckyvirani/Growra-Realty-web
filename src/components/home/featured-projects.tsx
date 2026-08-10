@@ -1,11 +1,9 @@
-import { getPropertiesByListingType } from "@/services/property-service";
+import type { Property } from "@/types";
 import { FadeIn } from "@/components/animations/fade-in";
 import { SectionHeading } from "@/components/common/section-heading";
 import { ProjectCard } from "@/components/cards/project-card";
 
-export async function FeaturedProjects() {
-  const projects = (await getPropertiesByListingType("projects")).slice(0, 6);
-
+export function FeaturedProjects({ projects }: { projects: Property[] }) {
   return (
     <section className="section-padding">
       <div className="container-luxury">

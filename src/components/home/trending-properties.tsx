@@ -1,11 +1,9 @@
-import { getTrendingProperties } from "@/services/property-service";
+import type { Property } from "@/types";
 import { FadeIn } from "@/components/animations/fade-in";
 import { SectionHeading } from "@/components/common/section-heading";
 import { PropertyCard } from "@/components/cards/property-card";
 
-export async function TrendingProperties() {
-  const properties = await getTrendingProperties();
-
+export function TrendingProperties({ properties }: { properties: Property[] }) {
   return (
     <section className="section-padding">
       <div className="container-luxury">
