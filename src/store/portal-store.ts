@@ -90,6 +90,9 @@ export interface PortalVisit {
   customerName: string;
   customerPhone: string;
   propertyTitle?: string;
+  propertySize?: string;
+  rate?: string;
+  propertyTypeLabel?: string;
   locationLabel: string;
   notes?: string;
 }

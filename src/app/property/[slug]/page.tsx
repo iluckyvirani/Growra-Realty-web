@@ -46,7 +46,6 @@ import { DealerEnquiryForm } from "@/components/property/dealer-enquiry-form";
 import { ViewTracker } from "@/components/property/view-tracker";
 import { PropertyCard } from "@/components/cards/property-card";
 import { Button } from "@/components/ui/button";
-import { MapPlaceholder } from "@/components/map/map-placeholder";
 import { PropertyContactCtas } from "@/components/property/property-contact-ctas";
 import { SiteLogo } from "@/components/common/site-logo";
 
@@ -427,19 +426,6 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
                 })}
               </div>
             </div>
-
-            {property.coordinates ? (
-              <div className="border-t border-border pt-6">
-                <h2 className="mb-3 text-lg font-bold text-charcoal">Live location</h2>
-                <MapPlaceholder
-                  lat={property.coordinates.lat}
-                  lng={property.coordinates.lng}
-                  label={`${property.locality}, ${property.city}`}
-                  size="md"
-                  className="shadow-sm"
-                />
-              </div>
-            ) : null}
 
             <div className="border-t border-border pt-6">
               <div className="flex items-end justify-between gap-3">

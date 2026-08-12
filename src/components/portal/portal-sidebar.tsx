@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   BookOpen,
   Building2,
+  Calculator,
   ExternalLink,
   LayoutDashboard,
   LogOut,
@@ -32,6 +33,7 @@ const NAV: NavItem[] = [
   { href: "/portal/listings", label: "My Properties", icon: Building2, owner: true, agent: true },
   { href: "/portal/inquiries", label: "Inquiries", icon: MessageSquare, owner: false, agent: true },
   { href: "/portal/diary", label: "Diary", icon: BookOpen, owner: false, agent: true },
+  { href: "/portal/calculators", label: "Calculators", icon: Calculator, owner: false, agent: true },
   { href: "/portal/tickets", label: "Tickets", icon: Ticket, owner: true, agent: true },
   { href: "/portal/chat", label: "Live Chat", icon: MessageCircle, owner: true, agent: true },
   { href: "/portal/profile", label: "Profile", icon: UserRound, owner: true, agent: true },

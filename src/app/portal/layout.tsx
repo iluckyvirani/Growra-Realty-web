@@ -24,6 +24,8 @@ function panelTitle(pathname: string, role?: string) {
   if (pathname.startsWith("/portal/inquiries"))
     return { title: portalName, subtitle: "Inquiries" };
   if (pathname.startsWith("/portal/diary")) return { title: portalName, subtitle: "Diary" };
+  if (pathname.startsWith("/portal/calculators"))
+    return { title: portalName, subtitle: "Calculators" };
   if (pathname.startsWith("/portal/tickets")) return { title: portalName, subtitle: "Tickets" };
   if (pathname.startsWith("/portal/chat")) return { title: portalName, subtitle: "Live Chat" };
   if (pathname.startsWith("/portal/profile")) return { title: portalName, subtitle: "Profile" };
@@ -107,7 +109,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                     {title}
                   </h1>
                   <span className="hidden rounded border border-gold/30 bg-champagne/60 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-gold-rich uppercase sm:inline">
-                    {user?.role === "agent" ? "Broker" : "Owner"}
+                    {user?.role === "agent" ? "Agent" : "Owner"}
                   </span>
                 </div>
                 {subtitle ? (

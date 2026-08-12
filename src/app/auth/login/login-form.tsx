@@ -455,7 +455,7 @@ export default function LoginForm() {
               {(
                 [
                   { id: "owner", label: "Owner" },
-                  { id: "agent", label: "Broker" },
+                  { id: "agent", label: "Agent" },
                 ] as const
               ).map((opt) => (
                 <button

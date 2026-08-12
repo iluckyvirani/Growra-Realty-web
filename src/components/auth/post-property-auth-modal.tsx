@@ -524,7 +524,7 @@ export function PostPropertyAuthModal({
               {(
                 [
                   { id: "owner", label: "Owner" },
-                  { id: "agent", label: "Broker" },
+                  { id: "agent", label: "Agent" },
                 ] as const
               ).map((opt) => (
                 <button

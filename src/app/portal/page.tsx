@@ -6,6 +6,7 @@ import {
   ArrowRight,
   BookOpen,
   Building2,
+  Calculator,
   CheckCircle2,
   Clock3,
   MessageCircle,
@@ -205,6 +206,14 @@ export default function PortalDashboardPage() {
               title="Diary"
               subtitle={`${upcomingVisits} upcoming visits`}
               icon={BookOpen}
+            />
+          ) : null}
+          {isAgent ? (
+            <QuickCard
+              href="/portal/calculators"
+              title="Calculators"
+              subtitle="Area, construction & EMI"
+              icon={Calculator}
             />
           ) : null}
           <QuickCard

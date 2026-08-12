@@ -14,7 +14,17 @@ import { type PortalVisit } from "@/store/portal-store";
 import { portalApi } from "@/lib/portal-api";
 import { ApiError } from "@/lib/api";
 
-const TYPES: PortalVisit["type"][] = ["Site Visit", "Office Meeting", "Video Call", "Callback"];
+const PROPERTY_TYPES = [
+  "Apartment",
+  "Villa",
+  "Plot",
+  "Independent House",
+  "Commercial",
+  "Office",
+  "Shop",
+  "Other",
+];
+
 const STATUSES: PortalVisit["status"][] = [
   "Scheduled",
   "Confirmed",
@@ -33,6 +43,17 @@ function tomorrowISO() {
   return d.toISOString().slice(0, 10);
 }
 
+const emptyForm = {
+  customerName: "",
+  locationLabel: "",
+  propertyName: "",
+  customerPhone: "",
+  propertySize: "",
+  rate: "",
+  date: tomorrowISO(),
+  propertyTypeLabel: "Apartment",
+};
+
 export default function PortalDiaryPage() {
   const router = useRouter();
   const role = useAuthStore((s) => s.user?.role);
@@ -42,17 +63,7 @@ export default function PortalDiaryPage() {
 
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({
-    title: "",
-    type: "Site Visit" as PortalVisit["type"],
-    date: tomorrowISO(),
-    time: "11:00",
-    customerName: "",
-    customerPhone: "",
-    propertyTitle: "",
-    locationLabel: "",
-    notes: "",
-  });
+  const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
     if (role === "owner") {
@@ -107,8 +118,8 @@ export default function PortalDiaryPage() {
 
   const onSchedule = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title.trim() || !form.customerName.trim() || !form.date) {
-      toast.error("Title, customer, and date are required");
+    if (!form.customerName.trim() || !form.propertyName.trim() || !form.date) {
+      toast.error("Name, property name, and alert date are required");
       return;
     }
     if (!token) {
@@ -119,35 +130,27 @@ export default function PortalDiaryPage() {
     try {
       const res = await portalApi.createVisit(
         {
-          title: form.title.trim(),
-          type: form.type,
-          date: form.date,
-          time: form.time,
           customerName: form.customerName.trim(),
           customerPhone: form.customerPhone.trim(),
-          propertyTitle: form.propertyTitle.trim() || undefined,
           locationLabel: form.locationLabel.trim() || "TBD",
-          notes: form.notes.trim() || undefined,
+          propertyName: form.propertyName.trim(),
+          propertyTitle: form.propertyName.trim(),
+          propertySize: form.propertySize.trim() || undefined,
+          rate: form.rate.trim() || undefined,
+          propertyTypeLabel: form.propertyTypeLabel.trim() || undefined,
+          date: form.date,
+          time: "09:00",
+          type: "Site Visit",
           status: "Scheduled",
         },
         token,
       );
       upsertVisit(res.data);
       setShowForm(false);
-      setForm({
-        title: "",
-        type: "Site Visit",
-        date: tomorrowISO(),
-        time: "11:00",
-        customerName: "",
-        customerPhone: "",
-        propertyTitle: "",
-        locationLabel: "",
-        notes: "",
-      });
-      toast.success("Visit added to diary");
+      setForm({ ...emptyForm, date: tomorrowISO() });
+      toast.success("Added to agent diary");
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : "Could not schedule visit");
+      toast.error(err instanceof ApiError ? err.message : "Could not save diary entry");
     } finally {
       setSubmitting(false);
     }
@@ -158,24 +161,24 @@ export default function PortalDiaryPage() {
     try {
       const res = await portalApi.updateVisit(id, { status }, token);
       upsertVisit(res.data);
-      toast.success("Visit status updated");
+      toast.success("Diary status updated");
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : "Could not update visit");
+      toast.error(err instanceof ApiError ? err.message : "Could not update entry");
     }
   };
 
   return (
-    <div className="mx-auto max-w-8  xl space-y-6">
+    <div className="mx-auto max-w-8xl space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-charcoal">Diary</h1>
           <p className="mt-1 text-sm text-muted">
-            Site visits &amp; meetings — same pattern as Growra admin diary.
+            Agent diary — leads, property details, and reminder alerts.
           </p>
         </div>
         <Button type="button" onClick={() => setShowForm((v) => !v)}>
           <CalendarPlus className="h-4 w-4" />
-          Schedule
+          Add entry
         </Button>
       </div>
 
@@ -187,7 +190,8 @@ export default function PortalDiaryPage() {
           <CardContent className="flex flex-wrap gap-2">
             {reminders.map((v) => (
               <Badge key={v.id} variant="gold" className="text-xs">
-                {v.date === todayISO() ? "Today" : "Tomorrow"} {v.time} — {v.customerName}
+                {v.date === todayISO() ? "Today" : "Tomorrow"} — {v.customerName}
+                {v.propertyTitle ? ` · ${v.propertyTitle}` : ""}
               </Badge>
             ))}
           </CardContent>
@@ -197,27 +201,53 @@ export default function PortalDiaryPage() {
       {showForm ? (
         <Card className="border-border/80 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg">Schedule visit / meeting</CardTitle>
-            <CardDescription>Link it to an inquiry when you capture offline leads.</CardDescription>
+            <CardTitle className="text-lg">New diary entry</CardTitle>
+            <CardDescription>
+              Save contact &amp; property details with an alert date for reminder.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={onSchedule} className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2 sm:col-span-2">
-                <Label>Title</Label>
+              <div className="space-y-2">
+                <Label>Name</Label>
                 <Input
-                  value={form.title}
-                  onChange={(e) => set("title", e.target.value)}
-                  placeholder="Site visit — Sector 150"
+                  value={form.customerName}
+                  onChange={(e) => set("customerName", e.target.value)}
+                  placeholder="Customer / owner name"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Type</Label>
+                <Label>Mobile number</Label>
+                <Input
+                  value={form.customerPhone}
+                  onChange={(e) => set("customerPhone", e.target.value)}
+                  placeholder="10-digit mobile"
+                />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label>Address</Label>
+                <Input
+                  value={form.locationLabel}
+                  onChange={(e) => set("locationLabel", e.target.value)}
+                  placeholder="Full address / locality"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Property Name</Label>
+                <Input
+                  value={form.propertyName}
+                  onChange={(e) => set("propertyName", e.target.value)}
+                  placeholder="Project / society name"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Property type</Label>
                 <select
-                  value={form.type}
-                  onChange={(e) => set("type", e.target.value)}
+                  value={form.propertyTypeLabel}
+                  onChange={(e) => set("propertyTypeLabel", e.target.value)}
                   className="flex h-10 w-full rounded-[8px] border border-border bg-surface px-3 text-sm"
                 >
-                  {TYPES.map((t) => (
+                  {PROPERTY_TYPES.map((t) => (
                     <option key={t} value={t}>
                       {t}
                     </option>
@@ -225,41 +255,24 @@ export default function PortalDiaryPage() {
                 </select>
               </div>
               <div className="space-y-2">
-                <Label>Location</Label>
+                <Label>Property Size</Label>
                 <Input
-                  value={form.locationLabel}
-                  onChange={(e) => set("locationLabel", e.target.value)}
-                  placeholder="Address or Phone"
+                  value={form.propertySize}
+                  onChange={(e) => set("propertySize", e.target.value)}
+                  placeholder="e.g. 1200 sq.ft"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Date</Label>
-                <Input type="date" value={form.date} onChange={(e) => set("date", e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label>Time</Label>
-                <Input type="time" value={form.time} onChange={(e) => set("time", e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label>Customer</Label>
+                <Label>Rate</Label>
                 <Input
-                  value={form.customerName}
-                  onChange={(e) => set("customerName", e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Phone</Label>
-                <Input
-                  value={form.customerPhone}
-                  onChange={(e) => set("customerPhone", e.target.value)}
+                  value={form.rate}
+                  onChange={(e) => set("rate", e.target.value)}
+                  placeholder="e.g. ₹85 Lakh / ₹6500 per sq.ft"
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
-                <Label>Property (optional)</Label>
-                <Input
-                  value={form.propertyTitle}
-                  onChange={(e) => set("propertyTitle", e.target.value)}
-                />
+                <Label>Alert Date for Reminder</Label>
+                <Input type="date" value={form.date} onChange={(e) => set("date", e.target.value)} />
               </div>
               <div className="flex gap-2 sm:col-span-2">
                 <Button type="submit" disabled={submitting}>
@@ -283,11 +296,24 @@ export default function PortalDiaryPage() {
               <CardContent className="flex flex-col gap-3 p-4 md:flex-row md:items-center md:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-semibold text-charcoal">{v.title}</p>
-                    <Badge variant="outline">{v.type}</Badge>
+                    <p className="font-semibold text-charcoal">
+                      {v.propertyTitle || v.title}
+                    </p>
+                    {v.propertyTypeLabel ? (
+                      <Badge variant="outline">{v.propertyTypeLabel}</Badge>
+                    ) : (
+                      <Badge variant="outline">{v.type}</Badge>
+                    )}
                   </div>
                   <p className="mt-1 text-sm text-muted">
-                    {v.date} · {v.time} · {v.customerName} · {v.locationLabel}
+                    {v.customerName}
+                    {v.customerPhone ? ` · ${v.customerPhone}` : ""}
+                    {v.locationLabel && v.locationLabel !== "TBD" ? ` · ${v.locationLabel}` : ""}
+                  </p>
+                  <p className="mt-1 text-sm text-muted">
+                    Alert: {v.date}
+                    {v.propertySize ? ` · Size: ${v.propertySize}` : ""}
+                    {v.rate ? ` · Rate: ${v.rate}` : ""}
                   </p>
                   {v.notes ? <p className="mt-1 text-xs text-muted">{v.notes}</p> : null}
                 </div>
@@ -309,7 +335,7 @@ export default function PortalDiaryPage() {
           ))}
         {!loading && visits.length === 0 ? (
           <Card className="border-dashed p-8 text-center text-sm text-muted">
-            Diary is empty. Schedule a visit or add one from an inquiry.
+            Diary is empty. Add a lead with property details and an alert date.
           </Card>
         ) : null}
       </div>

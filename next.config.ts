@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
         port: "4000",
         pathname: "/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: "growra-realty-server.onrender.com",
+        pathname: "/uploads/**",
+      },
     ],
   },
 };

@@ -11,6 +11,7 @@ import { PopularCities } from "@/components/home/popular-cities";
 import { BenefitsSection } from "@/components/home/benefits-section";
 import { FeaturedProjects } from "@/components/home/featured-projects";
 import { TrendingProperties } from "@/components/home/trending-properties";
+import { PropertyShortsSection } from "@/components/home/property-shorts-section";
 import { BudgetSection } from "@/components/home/budget-section";
 import { TestimonialsSection } from "@/components/home/testimonials-section";
 import { FaqSection } from "@/components/home/faq-section";
@@ -21,6 +22,8 @@ import {
   getPropertiesByListingType,
   getTrendingProperties,
 } from "@/services/property-service";
+import { getPropertyShorts } from "@/services/shorts-service";
+import { getHeroBanner } from "@/services/hero-banner-service";
 
 export const metadata: Metadata = {
   title: `${SITE_NAME} | Discover Extraordinary Living`,
@@ -28,14 +31,16 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [projects, trending] = await Promise.all([
+  const [projects, trending, shorts, heroBanner] = await Promise.all([
     getPropertiesByListingType("projects").then((p) => p.slice(0, 6)),
     getTrendingProperties(),
+    getPropertyShorts(8),
+    getHeroBanner(),
   ]);
 
   return (
     <>
-      <HeroSection />
+      <HeroSection banner={heroBanner} />
       <CategoriesSection />
       <BetterPlacesSection />
       <RentHomesSection />
@@ -47,6 +52,7 @@ export default async function HomePage() {
       <BenefitsSection />
       <FeaturedProjects projects={projects} />
       <TrendingProperties properties={trending} />
+      <PropertyShortsSection shorts={shorts} />
       <BudgetSection />
       <TestimonialsSection />
       <FaqSection />
